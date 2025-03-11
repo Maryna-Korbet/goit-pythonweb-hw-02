@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    ports:
+      - "80:8000"
+    container_name: pythonweb-hw-02-app
+    restart: always
+    networks:
+      - hw-02-networks
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+  postgres:
+    image: postgres:16
+    container_name: pythonweb-hw-02-postgres
+    environment:
+      POSTGRES_DB: hw02
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 567234
+    ports:
+      - "5432:5432"
+    volumes:
+      - pythonweb-hw-02-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hw-02-networks
+
+networks:
+  hw-02-networks:
+    driver: bridge
+
+volumes:
+  pythonweb-hw-02-postgres-data:
